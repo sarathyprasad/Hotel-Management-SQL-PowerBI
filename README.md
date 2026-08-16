@@ -25,7 +25,7 @@ Hotel-Management-SQL-PowerBI/
 
 * **Database Engine:** Microsoft SQL Server (T-SQL)
 * **Business Intelligence & Visualization:** Microsoft Power BI Desktop
-* **Analytics & Data Modeling:** DAX (Data Analysis Expressions), Power Query (M)
+* **Analytics & Data Modeling:** DAX (Data Analysis Expressions)
 * **Documentation & Storage:** Git, GitHub, PDF Export
 
 ---
