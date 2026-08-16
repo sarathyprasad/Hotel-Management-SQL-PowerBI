@@ -1,0 +1,101 @@
+// ============================================================
+// HOTEL MANAGEMENT SYSTEM - DASHBOARD DAX MEASURES
+// ============================================================
+
+// ------------------------------------------------------------
+// PAGE 1: REVENUE & FINANCIAL PERFORMANCE MEASURES
+// ------------------------------------------------------------
+
+Room Revenue = 
+SUMX(
+    Bookings,
+    VAR RoomDays = INT(Bookings[Check-Out Date] - Bookings[Check-In Date])
+    VAR NightStay = IF(RoomDays = 0, 1, RoomDays)
+    VAR CurrentRoomRate = RELATED(RType[Base Room Rate])
+    RETURN NightStay * CurrentRoomRate
+)
+
+Service Revenue = SUM(SUSAGE[Service Total Amount])
+
+Gross Projected Revenue = [Room Revenue] + [Service Revenue]
+
+Total Cash Collected = 
+CALCULATE(
+    SUM(PAYMENT[Payment Amount]), 
+    PAYMENT[Payment Status] = "Paid"
+)
+
+Total Receivables (Pending) = 
+CALCULATE(
+    SUM(PAYMENT[Payment Amount]), 
+    PAYMENT[Payment Status] = "Pending"
+)
+
+Net Cash Position = [Total Inflow (Paid)] - [Total Outflow (Payroll)]
+
+Net Cash Position running total in Month Short = 
+CALCULATE(
+    [Net Cash Position],
+    FILTER(
+        CALCULATETABLE(
+            SUMMARIZE('Dim_Date', 'Dim_Date'[Month Number], 'Dim_Date'[Month Short]),
+            ALLSELECTED('Dim_Date')
+        ),
+        ISONORAFTER(
+            'Dim_Date'[Month Number], MAX('Dim_Date'[Month Number]), DESC,
+            'Dim_Date'[Month Short], MAX('Dim_Date'[Month Short]), DESC
+        )
+    )
+)
+
+
+// ------------------------------------------------------------
+// PAGE 2: ROOM OCCUPANCY & RESERVATION ANALYTICS
+// ------------------------------------------------------------
+
+Total Available Rooms = COUNT(Rooms[RID])
+
+Occupied Rooms = 
+CALCULATE(
+    COUNT(Rooms[RID]), 
+    Rooms[Status] = "Occupied"
+)
+
+Rooms Occupied = 
+CALCULATE(
+    COUNT(Rooms[RID]), 
+    Rooms[Status] = "Occupied"
+)
+
+Rooms Clean & Ready = 
+CALCULATE(
+    COUNT(Rooms[RID]), 
+    Rooms[Status] = "AVAILABLE"
+)
+
+Rooms Out Of Service = 
+CALCULATE(
+    COUNT(Rooms[RID]), 
+    Rooms[Status] = "Maintenance"
+)
+
+Room Occupancy Rate = DIVIDE([Occupied Rooms], [Total Available Rooms], 0)
+
+RevPAR (Revenue Per Available Room) = [Room Revenue] / [Total Available Rooms]
+
+Average Room Rate = AVERAGE(RType[Base Room Rate])
+
+Total Bookings = COUNT(Bookings[BID])
+
+Total Guests Accommodated = SUM(Bookings[ADULTS]) + SUM(Bookings[CHILDRENS])
+
+
+// ------------------------------------------------------------
+// PAGE 3: STAFF & HR OPERATIONS MEASURES
+// ------------------------------------------------------------
+
+Staff Headcount = COUNT(Staff[ID])
+
+Total Monthly Staff Payroll = SUM(Staff[Salary])
+
+Average Staff Salary = AVERAGE(Staff[Salary])
