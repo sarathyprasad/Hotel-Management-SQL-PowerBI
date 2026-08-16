@@ -8,7 +8,6 @@ This repository contains the full SQL database schema (DDL, DML), analytical bus
 
 ## 📌 Repository Overview & Structure
 
-The repository structure matches the exact root files uploaded:
 
 ```text
 Hotel-Management-SQL-PowerBI/
